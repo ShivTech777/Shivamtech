@@ -1,0 +1,1360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shivam Tech OS - Final Edition</title>
+  <style>
+    :root {
+      --bg-base: #faf8fd;
+      --card-bg: #ffffff;
+      --border-color: rgba(226, 215, 245, 0.7);
+      --text-main: #1e192b;
+      --text-muted: #736b85;
+      --primary-accent: #9333ea;
+      --pastel-purple: #f3e8ff;
+      --pastel-pink: #fce7f3;
+      --pastel-green: #dcfce7;
+      --pastel-yellow: #fef9c3;
+      --glow-mixed: linear-gradient(135deg, #c084fc, #f472b6, #4ade80, #facc15);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: linear-gradient(135deg, #ede9fe, #fce7f3, #dcfce7, #fef9c3);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 14px;
+    }
+
+    .app-shell {
+      width: 100%;
+      max-width: 420px;
+      height: 800px;
+      background: var(--bg-base);
+      border-radius: 40px;
+      box-shadow: 0 25px 60px rgba(30, 25, 43, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.8);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      border: 3px solid #ffffff;
+    }
+
+    /* 1. INTRO / SPLASH SCREEN */
+    #splash-screen {
+      position: absolute;
+      inset: 0;
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+      transition: opacity 0.7s ease, visibility 0.7s;
+      cursor: pointer;
+    }
+
+    .splash-logo-container {
+      width: 96px;
+      height: 96px;
+      border-radius: 30px;
+      background: var(--glow-mixed);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 16px 36px rgba(192, 132, 252, 0.35);
+      animation: popScale 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes popScale {
+      0% { transform: scale(0.6); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .splash-brand {
+      margin-top: 22px;
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #9333ea, #ec4899);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .splash-song-badge {
+      margin-top: 12px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #9333ea;
+      background: var(--pastel-purple);
+      padding: 6px 14px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid rgba(147, 51, 234, 0.2);
+    }
+
+    .splash-hint {
+      margin-top: 14px;
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    /* TOP HEADER */
+    .top-header {
+      padding: 16px 20px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #ffffff;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .header-brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .back-btn {
+      border: 1px solid var(--border-color);
+      background: #faf5ff;
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .brand-title {
+      font-size: 20px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #9333ea, #ec4899);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .music-pill {
+      font-size: 11px;
+      font-weight: 700;
+      color: #ec4899;
+      background: var(--pastel-pink);
+      border: 1px solid rgba(236, 72, 153, 0.3);
+      padding: 5px 12px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      user-select: none;
+      box-shadow: 0 2px 6px rgba(236, 72, 153, 0.15);
+    }
+
+    /* VIEWPORT */
+    .content-viewport {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      position: relative;
+    }
+
+    .screen-view {
+      display: none;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .screen-view.active {
+      display: flex;
+    }
+
+    /* SEARCH BAR */
+    .search-container {
+      position: relative;
+      margin-bottom: 14px;
+    }
+
+    .search-field {
+      width: 100%;
+      height: 46px;
+      border-radius: 16px;
+      border: 1px solid var(--border-color);
+      background: #ffffff;
+      padding: 0 40px 0 40px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-main);
+      outline: none;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.02);
+    }
+
+    .search-field:focus {
+      border-color: #9333ea;
+    }
+
+    .search-ico {
+      position: absolute;
+      left: 14px;
+      top: 14px;
+      color: var(--text-muted);
+    }
+
+    .search-clear-btn {
+      position: absolute;
+      right: 14px;
+      top: 13px;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: none;
+      font-weight: bold;
+    }
+
+    /* SYSTEM STATUS */
+    .system-status-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(90deg, #f3e8ff, #fce7f3);
+      padding: 9px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--border-color);
+      margin-bottom: 16px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #7c3aed;
+    }
+
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10b981;
+      display: inline-block;
+      margin-right: 6px;
+      animation: pulseGreen 1.5s infinite;
+    }
+
+    @keyframes pulseGreen {
+      0% { opacity: 0.4; }
+      50% { opacity: 1; }
+      100% { opacity: 0.4; }
+    }
+
+    /* APPS GRID */
+    .drawer-title {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 12px;
+    }
+
+    .apps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .app-tile {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 16px 8px 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+      transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .app-tile:active {
+      transform: scale(0.95);
+    }
+
+    .app-tile-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 8px;
+      font-weight: 900;
+    }
+
+    .tile-calc .app-tile-icon { background: var(--pastel-purple); color: #9333ea; }
+    .tile-soon-1 .app-tile-icon { background: var(--pastel-pink); color: #ec4899; }
+    .tile-soon-2 .app-tile-icon { background: var(--pastel-green); color: #10b981; }
+    .tile-soon-3 .app-tile-icon { background: var(--pastel-yellow); color: #d97706; }
+
+    .app-tile-name {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .app-tile-tag {
+      font-size: 9px;
+      font-weight: 800;
+      margin-top: 3px;
+      letter-spacing: 0.2px;
+    }
+
+    /* RECENT HISTORY */
+    .history-card {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 14px;
+      margin-top: auto;
+    }
+
+    .history-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .history-list-box {
+      max-height: 90px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .history-entry {
+      font-size: 12px;
+      background: var(--bg-base);
+      padding: 6px 10px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      font-weight: 600;
+    }
+
+    /* CALCULATOR SCREEN */
+    .calc-tabs-bar {
+      display: flex;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 4px;
+      margin-bottom: 12px;
+    }
+
+    .calc-tab-item {
+      flex: 1;
+      padding: 8px 4px;
+      border: none;
+      background: transparent;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    .calc-tab-item.active {
+      background: linear-gradient(135deg, #9333ea, #ec4899);
+      color: #ffffff;
+      box-shadow: 0 4px 10px rgba(147, 51, 234, 0.2);
+    }
+
+    .calc-sub-panel {
+      display: none;
+      flex: 1;
+      flex-direction: column;
+    }
+
+    .calc-sub-panel.active {
+      display: flex;
+    }
+
+    /* MATH DISPLAY */
+    .calc-monitor {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 14px 18px;
+      min-height: 100px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: flex-end;
+      margin-bottom: 12px;
+      word-break: break-all;
+    }
+
+    .calc-expr {
+      font-size: 15px;
+      color: var(--text-muted);
+      min-height: 20px;
+    }
+
+    .calc-result {
+      font-size: 34px;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-top: 4px;
+    }
+
+    /* KEYPAD */
+    .keypad-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-top: auto;
+    }
+
+    .kbtn {
+      height: 48px;
+      border-radius: 14px;
+      border: 1px solid var(--border-color);
+      background: #ffffff;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-main);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .kbtn:active {
+      transform: scale(0.93);
+    }
+
+    .kbtn-op { background: var(--pastel-purple); color: #9333ea; }
+    .kbtn-fn { background: #faf5ff; color: var(--text-muted); font-size: 13px; }
+    .kbtn-ac { background: #fee2e2; color: #ef4444; border-color: #fca5a5; }
+    .kbtn-eq {
+      background: linear-gradient(135deg, #9333ea, #ec4899);
+      color: #ffffff;
+      grid-column: span 2;
+      font-size: 20px;
+      border: none;
+    }
+
+    /* EMI FORM */
+    .emi-card-form {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .emi-input-row {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .emi-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .limit-tag {
+      font-size: 10px;
+      color: #9333ea;
+      font-weight: 700;
+    }
+
+    .emi-field {
+      height: 42px;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      background: var(--bg-base);
+      padding: 0 12px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-main);
+      outline: none;
+    }
+
+    .emi-field:focus {
+      border-color: #9333ea;
+    }
+
+    .emi-summary-box {
+      margin-top: 12px;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 18px;
+      padding: 14px;
+      text-align: center;
+    }
+
+    .emi-big-amount {
+      font-size: 26px;
+      font-weight: 800;
+      color: #9333ea;
+      margin-top: 4px;
+    }
+
+    .emi-stats-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--border-color);
+    }
+
+    .sub-stat-p { font-size: 11px; color: var(--text-muted); }
+    .sub-stat-v { font-size: 13px; font-weight: 700; color: var(--text-main); margin-top: 2px; }
+
+    /* UNITS */
+    .unit-container {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .unit-select {
+      height: 42px;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      background: var(--bg-base);
+      padding: 0 10px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-main);
+      outline: none;
+    }
+
+    .unit-display-card {
+      margin-top: 14px;
+      background: linear-gradient(135deg, var(--pastel-purple), var(--pastel-pink));
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .unit-final-val {
+      font-size: 24px;
+      font-weight: 800;
+      color: #9333ea;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-shell">
+  <!-- 1. INTRO SPLASH SCREEN -->
+  <div id="splash-screen" onclick="startAppWithAudio()">
+    <div class="splash-logo-container">
+      <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="4" y="2" width="16" height="20" rx="2"></rect>
+        <line x1="8" y1="6" x2="16" y2="6"></line>
+        <line x1="16" y1="14" x2="16" y2="14.01"></line>
+        <line x1="12" y1="14" x2="12" y2="14.01"></line>
+        <line x1="8" y1="14" x2="8" y2="14.01"></line>
+      </svg>
+    </div>
+    <div class="splash-brand">Shivam Tech</div>
+    <div class="splash-song-badge">
+      <span>🎵</span> <span>Rang De Sathiya (Intro)</span>
+    </div>
+    <div class="splash-hint">Tap anywhere to start audio & open</div>
+  </div>
+
+  <!-- TOP HEADER -->
+  <header class="top-header">
+    <div class="header-brand-wrap">
+      <button class="back-btn" id="btn-back" onclick="navigateHome()">←</button>
+      <div class="brand-title">Shivam Tech</div>
+    </div>
+    <div class="music-pill" id="music-indicator" onclick="toggleBgmSound()">
+      <span>🔊</span> <span>Ishq De Faniyar</span>
+    </div>
+  </header>
+
+  <!-- VIEWPORT CONTENT -->
+  <main class="content-viewport">
+
+    <!-- SCREEN 1: HOME PAGE -->
+    <section class="screen-view active" id="view-home">
+      <!-- SEARCH BAR -->
+      <div class="search-container">
+        <span class="search-ico">🔍</span>
+        <input type="text" id="app-search" class="search-field" placeholder="Search apps or tools..." oninput="filterApps()">
+        <button class="search-clear-btn" id="search-clear-btn" onclick="clearSearch()">✕</button>
+      </div>
+
+      <!-- LIVE SYSTEM CLOCK -->
+      <div class="system-status-card">
+        <div><span class="live-dot"></span> <span id="sys-clock">Live Clock</span></div>
+        <div>System Live (Sync)</div>
+      </div>
+
+      <div class="drawer-title">Applications Drawer</div>
+
+      <!-- APPS GRID -->
+      <div class="apps-grid" id="apps-container">
+        <!-- 1. WORKING ADVANCED CALCULATOR -->
+        <div class="app-tile tile-calc" onclick="openAppScreen('calc')" data-name="calculator math emi unit converter">
+          <div class="app-tile-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="4" y="2" width="16" height="20" rx="2"></rect>
+              <line x1="8" y1="6" x2="16" y2="6"></line>
+              <line x1="16" y1="14" x2="16" y2="14.01"></line>
+              <line x1="12" y1="14" x2="12" y2="14.01"></line>
+              <line x1="8" y1="14" x2="8" y2="14.01"></line>
+            </svg>
+          </div>
+          <div class="app-tile-name">Calculator</div>
+          <div class="app-tile-tag" style="color:#9333ea;">Active Pro</div>
+        </div>
+
+        <!-- 2. SUN LOGO: NEW APP COMING SOON -->
+        <div class="app-tile tile-soon-1" onclick="triggerComingSoon('Yaari Hub')" data-name="new app coming soon yaari">
+          <div class="app-tile-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="4"></circle>
+              <path d="M12 2v2"></path>
+              <path d="M12 20v2"></path>
+              <path d="m4.93 4.93 1.41 1.41"></path>
+              <path d="m17.66 17.66 1.41 1.41"></path>
+              <path d="M2 12h2"></path>
+              <path d="M20 12h2"></path>
+              <path d="m6.34 17.66-1.41 1.41"></path>
+              <path d="m19.07 4.93-1.41 1.41"></path>
+            </svg>
+          </div>
+          <div class="app-tile-name">New App</div>
+          <div class="app-tile-tag" style="color:#ec4899;">Coming Soon</div>
+        </div>
+
+        <!-- 3. SUN LOGO: NEW APP COMING SOON -->
+        <div class="app-tile tile-soon-2" onclick="triggerComingSoon('Notes Pro')" data-name="new app coming soon notes">
+          <div class="app-tile-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="4"></circle>
+              <path d="M12 2v2"></path>
+              <path d="M12 20v2"></path>
+              <path d="m4.93 4.93 1.41 1.41"></path>
+              <path d="m17.66 17.66 1.41 1.41"></path>
+              <path d="M2 12h2"></path>
+              <path d="M20 12h2"></path>
+              <path d="m6.34 17.66-1.41 1.41"></path>
+              <path d="m19.07 4.93-1.41 1.41"></path>
+            </svg>
+          </div>
+          <div class="app-tile-name">New App</div>
+          <div class="app-tile-tag" style="color:#10b981;">Coming Soon</div>
+        </div>
+
+        <!-- 4. SUN LOGO: NEW APP COMING SOON -->
+        <div class="app-tile tile-soon-3" onclick="triggerComingSoon('IoT Scanner')" data-name="new app coming soon iot">
+          <div class="app-tile-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="4"></circle>
+              <path d="M12 2v2"></path>
+              <path d="M12 20v2"></path>
+              <path d="m4.93 4.93 1.41 1.41"></path>
+              <path d="m17.66 17.66 1.41 1.41"></path>
+              <path d="M2 12h2"></path>
+              <path d="M20 12h2"></path>
+              <path d="m6.34 17.66-1.41 1.41"></path>
+              <path d="m19.07 4.93-1.41 1.41"></path>
+            </svg>
+          </div>
+          <div class="app-tile-name">New App</div>
+          <div class="app-tile-tag" style="color:#d97706;">Coming Soon</div>
+        </div>
+
+        <!-- 5. SUN LOGO: NEW APP COMING SOON -->
+        <div class="app-tile tile-soon-1" onclick="triggerComingSoon('Weather')" data-name="new app coming soon weather">
+          <div class="app-tile-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="4"></circle>
+              <path d="M12 2v2"></path>
+              <path d="M12 20v2"></path>
+              <path d="m4.93 4.93 1.41 1.41"></path>
+              <path d="m17.66 17.66 1.41 1.41"></path>
+              <path d="M2 12h2"></path>
+              <path d="M20 12h2"></path>
+              <path d="m6.34 17.66-1.41 1.41"></path>
+              <path d="m19.07 4.93-1.41 1.41"></path>
+            </svg>
+          </div>
+          <div class="app-tile-name">New App</div>
+          <div class="app-tile-tag" style="color:#ec4899;">Coming Soon</div>
+        </div>
+
+        <!-- 6. SUN LOGO: NEW APP COMING SOON -->
+        <div class="app-tile tile-soon-2" onclick="triggerComingSoon('Store')" data-name="new app coming soon store">
+          <div class="app-tile-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="4"></circle>
+              <path d="M12 2v2"></path>
+              <path d="M12 20v2"></path>
+              <path d="m4.93 4.93 1.41 1.41"></path>
+              <path d="m17.66 17.66 1.41 1.41"></path>
+              <path d="M2 12h2"></path>
+              <path d="M20 12h2"></path>
+              <path d="m6.34 17.66-1.41 1.41"></path>
+              <path d="m19.07 4.93-1.41 1.41"></path>
+            </svg>
+          </div>
+          <div class="app-tile-name">New App</div>
+          <div class="app-tile-tag" style="color:#10b981;">Coming Soon</div>
+        </div>
+      </div>
+
+      <!-- RECENT HISTORY -->
+      <div class="history-card">
+        <div class="history-top">
+          <span>Recent Activity & History</span>
+          <button style="border:none; background:none; color:#ef4444; font-size:11px; font-weight:700; cursor:pointer;" onclick="clearHistoryLog()">Clear</button>
+        </div>
+        <div class="history-list-box" id="history-entries">
+          <div class="history-entry"><span>App Launched</span><span>Now</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCREEN 2: ALL-IN-ONE CALCULATOR -->
+    <section class="screen-view" id="view-calc">
+      <div class="calc-tabs-bar">
+        <button class="calc-tab-item active" onclick="switchCalcSub('math', this)">Calculator</button>
+        <button class="calc-tab-item" onclick="switchCalcSub('emi', this)">Loan EMI</button>
+        <button class="calc-tab-item" onclick="switchCalcSub('unit', this)">Units</button>
+      </div>
+
+      <!-- SUB-TAB 1: ADVANCED MATH -->
+      <div class="calc-sub-panel active" id="panel-math">
+        <div class="calc-monitor">
+          <div class="calc-expr" id="math-expression"></div>
+          <div class="calc-result" id="math-result">0</div>
+        </div>
+
+        <div class="keypad-grid">
+          <button class="kbtn kbtn-fn" onclick="mathScientific('sin')">sin</button>
+          <button class="kbtn kbtn-fn" onclick="mathScientific('cos')">cos</button>
+          <button class="kbtn kbtn-fn" onclick="mathScientific('sqrt')">√</button>
+          <button class="kbtn kbtn-fn" onclick="mathKey('**')">^</button>
+
+          <button class="kbtn kbtn-ac" onclick="mathAllClear()">AC</button>
+          <button class="kbtn kbtn-fn" onclick="mathBackspace()">⌫</button>
+          <button class="kbtn kbtn-op" onclick="mathKey('%')">%</button>
+          <button class="kbtn kbtn-op" onclick="mathKey('/')">÷</button>
+
+          <button class="kbtn" onclick="mathKey('7')">7</button>
+          <button class="kbtn" onclick="mathKey('8')">8</button>
+          <button class="kbtn" onclick="mathKey('9')">9</button>
+          <button class="kbtn kbtn-op" onclick="mathKey('*')">×</button>
+
+          <button class="kbtn" onclick="mathKey('4')">4</button>
+          <button class="kbtn" onclick="mathKey('5')">5</button>
+          <button class="kbtn" onclick="mathKey('6')">6</button>
+          <button class="kbtn kbtn-op" onclick="mathKey('-')">−</button>
+
+          <button class="kbtn" onclick="mathKey('1')">1</button>
+          <button class="kbtn" onclick="mathKey('2')">2</button>
+          <button class="kbtn" onclick="mathKey('3')">3</button>
+          <button class="kbtn kbtn-op" onclick="mathKey('+')">+</button>
+
+          <button class="kbtn" onclick="mathKey('0')">0</button>
+          <button class="kbtn" onclick="mathKey('.')">.</button>
+          <button class="kbtn kbtn-eq" onclick="mathSolveEquation()">=</button>
+        </div>
+      </div>
+
+      <!-- SUB-TAB 2: STRICT LOAN EMI -->
+      <div class="calc-sub-panel" id="panel-emi">
+        <div class="emi-card-form">
+          <div class="emi-input-row">
+            <div class="emi-label">
+              <span>Principal Loan Amount</span>
+              <span class="limit-tag">No Max Limit</span>
+            </div>
+            <input type="number" id="emi-principal" class="emi-field" placeholder="e.g. 500000" oninput="computeStrictLoanEMI()">
+          </div>
+
+          <div class="emi-input-row">
+            <div class="emi-label">
+              <span>Annual Interest Rate (%)</span>
+              <span class="limit-tag">Strict Max: 100%</span>
+            </div>
+            <input type="number" step="0.1" id="emi-rate" class="emi-field" placeholder="e.g. 8.5" oninput="computeStrictLoanEMI()">
+          </div>
+
+          <div class="emi-input-row">
+            <div class="emi-label">
+              <span>Tenure (Years)</span>
+              <span class="limit-tag">Max: 100 Years</span>
+            </div>
+            <input type="number" id="emi-years" class="emi-field" placeholder="0 - 100" min="0" max="100" oninput="validateYears(this); computeStrictLoanEMI()">
+          </div>
+
+          <div class="emi-input-row">
+            <div class="emi-label">
+              <span>Extra Months</span>
+              <span class="limit-tag">Max: 12 Months</span>
+            </div>
+            <input type="number" id="emi-months" class="emi-field" placeholder="0 - 12" min="0" max="12" oninput="validateMonths(this); computeStrictLoanEMI()">
+          </div>
+        </div>
+
+        <div class="emi-summary-box">
+          <div style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Monthly EMI</div>
+          <div class="emi-big-amount" id="emi-monthly-out">₹ 0</div>
+
+          <div class="emi-stats-row">
+            <div>
+              <div class="sub-stat-p">Total Interest</div>
+              <div class="sub-stat-v" id="emi-interest-out" style="color:#ea580c;">₹ 0</div>
+            </div>
+            <div>
+              <div class="sub-stat-p">Total Amount Payable</div>
+              <div class="sub-stat-v" id="emi-total-out" style="color:#9333ea;">₹ 0</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUB-TAB 3: ACCURATE UNIT CONVERTER -->
+      <div class="calc-sub-panel" id="panel-unit">
+        <div class="unit-container">
+          <div class="emi-input-row">
+            <label class="emi-label">Category</label>
+            <select class="unit-select" id="unit-category" onchange="setupUnitSelections()">
+              <option value="length">Length</option>
+              <option value="weight">Weight / Mass</option>
+              <option value="temp">Temperature</option>
+              <option value="data">Digital Storage</option>
+            </select>
+          </div>
+
+          <div class="emi-input-row">
+            <label class="emi-label">Input Value</label>
+            <input type="number" id="unit-input-val" class="emi-field" placeholder="e.g. 10" oninput="performUnitConversion()">
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+            <div class="emi-input-row">
+              <label class="emi-label">From</label>
+              <select class="unit-select" id="unit-from-type" onchange="performUnitConversion()"></select>
+            </div>
+            <div class="emi-input-row">
+              <label class="emi-label">To</label>
+              <select class="unit-select" id="unit-to-type" onchange="performUnitConversion()"></select>
+            </div>
+          </div>
+        </div>
+
+        <div class="unit-display-card">
+          <div style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Converted Result</div>
+          <div class="unit-final-val" id="unit-result-out">0</div>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+</div>
+
+<script>
+  // AUDIO ENGINE (ROBUST WEB AUDIO API SYNTHESIZER)
+  let audioCtx = null;
+  let bgmInterval = null;
+  let bgmActive = false;
+  let appStarted = false;
+
+  function ensureAudioContext() {
+    if (!audioCtx) {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (AudioContextClass) {
+        audioCtx = new AudioContextClass();
+      }
+    }
+    if (audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+  }
+
+  // Play musical tone with safe frequency clamping
+  function playSynthTone(freq, type = 'sine', duration = 0.1, gainVal = 0.15) {
+    try {
+      ensureAudioContext();
+      if (!audioCtx) return;
+
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+      gain.gain.setValueAtTime(gainVal, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start();
+      osc.stop(audioCtx.currentTime + duration);
+    } catch (e) {
+      console.warn("Audio playback exception handled:", e);
+    }
+  }
+
+  // SONG 1: "Rang De Sathiya" Theme Melody
+  function playRangDeSathiyaMelody() {
+    ensureAudioContext();
+    const notes = [
+      { f: 293.66, d: 0.22 }, // D4
+      { f: 329.63, d: 0.22 }, // E4
+      { f: 369.99, d: 0.25 }, // F#4
+      { f: 440.00, d: 0.35 }, // A4
+      { f: 493.88, d: 0.25 }, // B4
+      { f: 440.00, d: 0.28 }, // A4
+      { f: 369.99, d: 0.28 }, // F#4
+      { f: 293.66, d: 0.45 }  // D4
+    ];
+
+    let delay = 0;
+    notes.forEach(item => {
+      setTimeout(() => {
+        playSynthTone(item.f, 'triangle', item.d, 0.22);
+      }, delay);
+      delay += 230;
+    });
+  }
+
+  // SONG 2: "Ishq De Faniyar" Background Loop
+  function startIshqDeFaniyarBGM() {
+    ensureAudioContext();
+    if (bgmInterval) clearInterval(bgmInterval);
+
+    // Harmonic progression motif: F#4 -> A4 -> B4 -> C#5 -> B4 -> A4 -> F#4 -> E4
+    const bgmNotes = [369.99, 440.00, 493.88, 554.37, 493.88, 440.00, 369.99, 329.63];
+    let noteIdx = 0;
+
+    bgmActive = true;
+    updateBgmButtonUI(true);
+
+    bgmInterval = setInterval(() => {
+      if (!bgmActive) return;
+      playSynthTone(bgmNotes[noteIdx % bgmNotes.length], 'sine', 0.26, 0.08);
+      noteIdx++;
+    }, 420);
+  }
+
+  function stopIshqDeFaniyarBGM() {
+    if (bgmInterval) {
+      clearInterval(bgmInterval);
+      bgmInterval = null;
+    }
+    bgmActive = false;
+    updateBgmButtonUI(false);
+  }
+
+  function toggleBgmSound() {
+    ensureAudioContext();
+    playSynthTone(500, 'sine', 0.08, 0.1);
+    if (bgmActive) {
+      stopIshqDeFaniyarBGM();
+    } else {
+      startIshqDeFaniyarBGM();
+    }
+  }
+
+  function updateBgmButtonUI(isPlaying) {
+    const pill = document.getElementById('music-indicator');
+    if (!pill) return;
+    if (isPlaying) {
+      pill.innerHTML = '<span>🔊</span> <span>Ishq De Faniyar</span>';
+      pill.style.opacity = '1';
+    } else {
+      pill.innerHTML = '<span>🔇</span> <span>BGM Muted</span>';
+      pill.style.opacity = '0.75';
+    }
+  }
+
+  // USER INTERACTION GATEWAY (AUTOPLAY WORKAROUND)
+  function startAppWithAudio() {
+    if (appStarted) return;
+    appStarted = true;
+    ensureAudioContext();
+
+    playRangDeSathiyaMelody();
+
+    setTimeout(() => {
+      const splash = document.getElementById('splash-screen');
+      if (splash) {
+        splash.style.opacity = '0';
+        setTimeout(() => {
+          splash.style.display = 'none';
+          startIshqDeFaniyarBGM();
+        }, 700);
+      }
+    }, 1800);
+  }
+
+  // Fallback auto-transition
+  window.addEventListener('DOMContentLoaded', () => {
+    setupUnitSelections();
+    updateLiveClockTime();
+    setInterval(updateLiveClockTime, 1000);
+
+    setTimeout(() => {
+      if (!appStarted) {
+        startAppWithAudio();
+      }
+    }, 3200);
+  });
+
+  // LIVE CLOCK (ACCURATE)
+  function updateLiveClockTime() {
+    const clockEl = document.getElementById('sys-clock');
+    if (!clockEl) return;
+    const now = new Date();
+    const opts = { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+    clockEl.innerText = now.toLocaleDateString('en-GB', opts);
+  }
+
+  // NAVIGATION & CLICKS
+  function triggerComingSoon(appName) {
+    playSynthTone(600, 'triangle', 0.12, 0.15);
+    alert(appName + " is coming soon in the next Shivam Tech update!");
+    recordHistory("Clicked " + appName + " (Coming Soon)");
+  }
+
+  function openAppScreen(screenKey) {
+    playSynthTone(700, 'sine', 0.08, 0.15);
+    if (screenKey === 'calc') {
+      document.getElementById('view-home').classList.remove('active');
+      document.getElementById('view-calc').classList.add('active');
+      document.getElementById('btn-back').style.display = 'flex';
+      recordHistory("Opened Calculator");
+    }
+  }
+
+  function navigateHome() {
+    playSynthTone(400, 'sine', 0.08, 0.12);
+    document.getElementById('view-calc').classList.remove('active');
+    document.getElementById('view-home').classList.add('active');
+    document.getElementById('btn-back').style.display = 'none';
+  }
+
+  function switchCalcSub(subKey, btnEl) {
+    playSynthTone(550, 'sine', 0.06, 0.12);
+    document.querySelectorAll('.calc-tab-item').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.calc-sub-panel').forEach(p => p.classList.remove('active'));
+    btnEl.classList.add('active');
+    document.getElementById('panel-' + subKey).classList.add('active');
+  }
+
+  // SEARCH FILTER
+  function filterApps() {
+    const input = document.getElementById('app-search');
+    const q = input.value.trim().toLowerCase();
+    document.getElementById('search-clear-btn').style.display = q.length > 0 ? 'block' : 'none';
+
+    const tiles = document.querySelectorAll('.app-tile');
+    tiles.forEach(tile => {
+      const tags = tile.getAttribute('data-name') || '';
+      tile.style.display = tags.toLowerCase().includes(q) ? 'flex' : 'none';
+    });
+
+    if (q.length > 3) {
+      recordHistory("Search: " + q);
+    }
+  }
+
+  function clearSearch() {
+    playSynthTone(350, 'sine', 0.06, 0.1);
+    const input = document.getElementById('app-search');
+    input.value = '';
+    document.getElementById('search-clear-btn').style.display = 'none';
+    filterApps();
+  }
+
+  // HISTORY
+  function recordHistory(entry) {
+    const container = document.getElementById('history-entries');
+    if (!container) return;
+    const div = document.createElement('div');
+    div.className = 'history-entry';
+    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    div.innerHTML = '<span>' + entry + '</span><span style="color:#94a3b8; font-size:10px;">' + time + '</span>';
+    container.prepend(div);
+
+    if (container.children.length > 12) {
+      container.removeChild(container.lastChild);
+    }
+  }
+
+  function clearHistoryLog() {
+    playSynthTone(300, 'sine', 0.1, 0.1);
+    document.getElementById('history-entries').innerHTML = '<div class="history-entry" style="color:#94a3b8;">History cleared</div>';
+  }
+
+  // MATHEMATICAL CALCULATOR ENGINE
+  let currentExpr = '';
+
+  function mathKey(val) {
+    playSynthTone(480, 'sine', 0.05, 0.1);
+    currentExpr += val;
+    renderMath();
+  }
+
+  function mathScientific(fn) {
+    playSynthTone(540, 'sine', 0.08, 0.12);
+    if (fn === 'sin') currentExpr += 'Math.sin(';
+    if (fn === 'cos') currentExpr += 'Math.cos(';
+    if (fn === 'sqrt') currentExpr += 'Math.sqrt(';
+    renderMath();
+  }
+
+  function mathBackspace() {
+    playSynthTone(320, 'sine', 0.06, 0.1);
+    if (currentExpr.endsWith('Math.sin(') || currentExpr.endsWith('Math.cos(')) {
+      currentExpr = currentExpr.slice(0, -9);
+    } else if (currentExpr.endsWith('Math.sqrt(')) {
+      currentExpr = currentExpr.slice(0, -10);
+    } else {
+      currentExpr = currentExpr.slice(0, -1);
+    }
+    renderMath();
+  }
+
+  function mathAllClear() {
+    playSynthTone(250, 'sine', 0.08, 0.12);
+    currentExpr = '';
+    document.getElementById('math-expression').innerText = '';
+    document.getElementById('math-result').innerText = '0';
+  }
+
+  function renderMath() {
+    const formatted = currentExpr.replaceAll('Math.sin(', 'sin(')
+                                 .replaceAll('Math.cos(', 'cos(')
+                                 .replaceAll('Math.sqrt(', '√(')
+                                 .replaceAll('**', '^')
+                                 .replaceAll('*', '×')
+                                 .replaceAll('/', '÷');
+    document.getElementById('math-expression').innerText = formatted;
+  }
+
+  function mathSolveEquation() {
+    playSynthTone(750, 'triangle', 0.12, 0.18);
+    try {
+      if (!currentExpr) return;
+      let exp = currentExpr;
+
+      let openCount = (exp.match(/\(/g) || []).length;
+      let closeCount = (exp.match(/\)/g) || []).length;
+      while (openCount > closeCount) {
+        exp += ')';
+        closeCount++;
+      }
+
+      exp = exp.replace(/([0-9.]+)\s*%\s*([0-9.]+)/g, '($1 * $2 / 100)');
+      exp = exp.replace(/([0-9.]+)\s*%/g, '($1 / 100)');
+
+      const res = Function('"use strict"; return (' + exp + ')')();
+      if (res !== undefined && !isNaN(res) && isFinite(res)) {
+        const out = Number.isInteger(res) ? res.toString() : parseFloat(res.toFixed(8)).toString();
+        document.getElementById('math-result').innerText = out;
+        recordHistory(document.getElementById('math-expression').innerText + ' = ' + out);
+      } else {
+        document.getElementById('math-result').innerText = 'Error';
+      }
+    } catch (e) {
+      document.getElementById('math-result').innerText = 'Error';
+    }
+  }
+
+  // STRICT LOAN EMI ENGINE
+  function validateMonths(input) {
+    if (parseFloat(input.value) > 12) {
+      playSynthTone(220, 'sawtooth', 0.18, 0.2);
+      input.value = 12;
+      alert("Strict Limit: Extra months cannot exceed 12 months!");
+    }
+    if (parseFloat(input.value) < 0) input.value = 0;
+  }
+
+  function validateYears(input) {
+    if (parseFloat(input.value) > 100) {
+      playSynthTone(220, 'sawtooth', 0.18, 0.2);
+      input.value = 100;
+      alert("Strict Limit: Loan tenure cannot exceed 100 years!");
+    }
+    if (parseFloat(input.value) < 0) input.value = 0;
+  }
+
+  function computeStrictLoanEMI() {
+    const P = parseFloat(document.getElementById('emi-principal').value);
+    const annualRate = parseFloat(document.getElementById('emi-rate').value);
+    const years = parseFloat(document.getElementById('emi-years').value) || 0;
+    const extraMonths = parseFloat(document.getElementById('emi-months').value) || 0;
+
+    const totalMonths = (years * 12) + extraMonths;
+
+    if (!P || P <= 0 || !annualRate || annualRate <= 0 || totalMonths <= 0) {
+      document.getElementById('emi-monthly-out').innerText = '₹ 0';
+      document.getElementById('emi-interest-out').innerText = '₹ 0';
+      document.getElementById('emi-total-out').innerText = '₹ 0';
+      return;
+    }
+
+    const R = annualRate / (12 * 100);
+    const factor = Math.pow(1 + R, totalMonths);
+    const emi = (P * R * factor) / (factor - 1);
+
+    if (isNaN(emi) || !isFinite(emi)) return;
+
+    const totalPay = emi * totalMonths;
+    const totalInt = totalPay - P;
+
+    document.getElementById('emi-monthly-out').innerText = '₹ ' + Math.round(emi).toLocaleString('en-IN');
+    document.getElementById('emi-interest-out').innerText = '₹ ' + Math.round(totalInt).toLocaleString('en-IN');
+    document.getElementById('emi-total-out').innerText = '₹ ' + Math.round(totalPay).toLocaleString('en-IN');
+
+    recordHistory('EMI: ₹' + Math.round(P).toLocaleString('en-IN') + ' @ ' + annualRate + '%');
+  }
+
+  // UNITS ENGINE
+  const unitCatalog = {
+    length: {
+      units: {
+        m: { name: 'Meters (m)', factor: 1 },
+        km: { name: 'Kilometers (km)', factor: 1000 },
+        cm: { name: 'Centimeters (cm)', factor: 0.01 },
+        mm: { name: 'Millimeters (mm)', factor: 0.001 },
+        ft: { name: 'Feet (ft)', factor: 0.3048 },
+        inch: { name: 'Inches (in)', factor: 0.0254 },
+        mile: { name: 'Miles (mile)', factor: 1609.344 }
+      }
+    },
+    weight: {
+      units: {
+        kg: { name: 'Kilograms (kg)', factor: 1 },
+        g: { name: 'Grams (g)', factor: 0.001 },
+        mg: { name: 'Milligrams (mg)', factor: 0.000001 },
+        quintal: { name: 'Quintals (q)', factor: 100 },
+        ton: { name: 'Metric Tons (t)', factor: 1000 },
+        lb: { name: 'Pounds (lb)', factor: 0.45359237 }
+      }
+    },
+    temp: {
+      special: true,
+      units: {
+        c: { name: 'Celsius (°C)' },
+        f: { name: 'Fahrenheit (°F)' },
+        k: { name: 'Kelvin (K)' }
+      }
+    },
+    data: {
+      units: {
+        b: { name: 'Bytes (B)', factor: 1 },
+        kb: { name: 'Kilobytes (KB)', factor: 1024 },
+        mb: { name: 'Megabytes (MB)', factor: 1048576 },
+        gb: { name: 'Gigabytes (GB)', factor: 1073741824 },
+        tb: { name: 'Terabytes (TB)', factor: 1099511627776 }
+      }
+    }
+  };
+
+  function setupUnitSelections() {
+    const cat = document.getElementById('unit-category').value;
+    const fromSel = document.getElementById('unit-from-type');
+    const toSel = document.getElementById('unit-to-type');
+    fromSel.innerHTML = '';
+    toSel.innerHTML = '';
+
+    const dataset = unitCatalog[cat].units;
+    const keys = Object.keys(dataset);
+
+    keys.forEach((key, idx) => {
+      const opt1 = document.createElement('option');
+      opt1.value = key;
+      opt1.innerText = dataset[key].name;
+      fromSel.appendChild(opt1);
+
+      const opt2 = document.createElement('option');
+      opt2.value = key;
+      opt2.innerText = dataset[key].name;
+      if (idx === 1) opt2.selected = true;
+      toSel.appendChild(opt2);
+    });
+
+    performUnitConversion();
+  }
+
+  function performUnitConversion() {
+    const cat = document.getElementById('unit-category').value;
+    const val = parseFloat(document.getElementById('unit-input-val').value);
+    const from = document.getElementById('unit-from-type').value;
+    const to = document.getElementById('unit-to-type').value;
+
+    if (isNaN(val)) {
+      document.getElementById('unit-result-out').innerText = '0';
+      return;
+    }
+
+    if (cat === 'temp') {
+      let cVal = val;
+      if (from === 'f') cVal = (val - 32) * 5 / 9;
+      if (from === 'k') cVal = val - 273.15;
+
+      let res = cVal;
+      if (to === 'f') res = (cVal * 9 / 5) + 32;
+      if (to === 'k') res = cVal + 273.15;
+
+      document.getElementById('unit-result-out').innerText = res.toFixed(2) + ' ' + to.toUpperCase();
+      return;
+    }
+
+    const dataset = unitCatalog[cat].units;
+    const base = val * dataset[from].factor;
+    const target = base / dataset[to].factor;
+
+    const clean = Number.isInteger(target) ? target : parseFloat(target.toFixed(6));
+    document.getElementById('unit-result-out').innerText = clean + ' ' + to;
+  }
+</script>
+</body>
+</html>
